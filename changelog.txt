@@ -1,4 +1,10 @@
 Version log
+2.0.0
+Add support for Sonarr v3 API, used in Sonarr v3 and v4
+Fix poster display on Series tab
+Update extension to manifest v3
+Change extension name to Sonarr ReConnect
+
 1.5.0
 Resolve issue: unable to select season in show view, if you have any issues please update to at least 2.0.0.3732
 

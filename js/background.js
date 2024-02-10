@@ -12,9 +12,9 @@ var background = {
   setBadge : function (num) {
     console.log(num);
     if (background.options.showBadge == "true" || num > 0)
-      chrome.browserAction.setBadgeText({text: num});
+      chrome.action.setBadgeText({text: num});
     else 
-      chrome.browserAction.setBadgeText({text: ''});
+      chrome.action.setBadgeText({text: ''});
   },
   setTimer : function (data) { 
     // set interval
