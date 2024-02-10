@@ -31,7 +31,7 @@ function formatDate(date, positiveOffset) {
 function getImageUrl(data) {
   if(typeof data == "object"){
     var start = data.url.indexOf('MediaCover')
-    var newUrl = app.settings.url + "api/" +  data.url.substring(start) + "&apikey=" + app.settings.apiKey;
+    var newUrl = app.settings.url + "api/v3/" +  data.url.substring(start) + "&apikey=" + app.settings.apiKey;
     return newUrl;
   } else {
     var noimg = "";

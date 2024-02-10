@@ -2,15 +2,15 @@
  ** Sonnarr Extention
  ** Shows upcoming and missed episodes.
  */
-var sonarr = {
+ var sonarr = {
   settings : {
-    wanted : "api/wanted/missing?page=1&pageSize={wantedItems}&sortKey=airDateUtc&sortDir=desc&apikey={apikey}",
-    calendar : "api/calendar?page=1&sortKey=airDateUtc&sortDir=desc&start={calendarStartDate}&end={calendarEndDate}&apikey={apikey}",
-    series : "api/series?page=1&sortKey=title&sortDir=desc&apikey={apikey}",
-    episode : "api/episode/\{episodeId}?apikey={apikey}",
-    episodes : "api/episode?seriesId={seriesId}&apikey={apikey}",
-    history : "api/history?page=1&pageSize={historyItems}&sortKey=date&sortDir=desc&apikey={apikey}",
-    manualDownload : "/api/release?episodeId={episodeId}&sort_by=releaseWeight&order=asc&apikey={apikey}"
+    wanted : "api/v3/wanted/missing?page=1&pageSize={wantedItems}&sortKey=airDateUtc&sortDir=desc&includeSeries=true&apikey={apikey}",
+    calendar : "api/v3/calendar?page=1&sortKey=airDateUtc&includeSeries=true&includeEpisode=true&sortDir=desc&start={calendarStartDate}&end={calendarEndDate}&apikey={apikey}",
+    series : "api/v3/series?page=1&sortKey=title&sortDir=desc&apikey={apikey}",
+    episode : "api/v3/episode/\{episodeId}?apikey={apikey}",
+    episodes : "api/v3/episode?seriesId={seriesId}&apikey={apikey}",
+    history : "api/v3/history?page=1&pageSize={historyItems}&sortKey=date&sortDir=desc&includeEpisode=true&includeSeries=true&apikey={apikey}",
+    manualDownload : "/api/v3/release?episodeId={episodeId}&sort_by=releaseWeight&order=asc&apikey={apikey}"
   },
   getData : function(mode, callback, id) {
 
@@ -52,7 +52,7 @@ var sonarr = {
   setData : function (mode, data, callback){
     var url = sonarr.settings[mode];
     url = url.replace("{seriesId}", data.id);
-    url = url.replace("{episodeId}", "" );
+    url = url.replace("{episodeId}", data.id);
     url = url.replace("{apikey}", app.settings.apiKey);
 
     url = app.settings.url + url;
@@ -61,6 +61,7 @@ var sonarr = {
       type: "put",
       url: url,
       data: JSON.stringify(data),
+      contentType: "application/json",
       processData: true
     }).done(function( data ) {
       console.log(data);
@@ -115,7 +116,7 @@ var create = {
     // episodeShowTitle
     if (data.seriesTitle !== null) {
       episode.find(".series-title").html(data.seriesTitle);
-      episode.find(".series-title").attr('data-series-id', data.seriesId );;
+      episode.find(".series-title").attr('data-series-id', data.seriesId );
     } else {
       episode.find(".episode-show-title").addClass(classes['hide']);
     }
@@ -189,7 +190,7 @@ var create = {
     var html = '';
     var show = $('.templates .show.template').clone();
     // images
-    show.find(".poster img").attr('src', getImageUrl(showdata.images[2]));
+    show.find(".poster img").attr('src', getImageUrl(showdata.images[1]));
     show.find(".banner").css("background-image", 'url(" '+ getImageUrl(showdata.images[1]) + '")');
 
     // texts
@@ -202,8 +203,8 @@ var create = {
     show.find("#network").html(showdata.network);
     show.find("#start-year").append("Started " + showdata.year);
     show.find("#show-status").append(showdata.status);
-    show.find("#seasons").append("Seasons " + showdata.seasonCount);
-    show.find("#episodes").html(showdata.episodeFileCount + "/" + showdata.episodeCount).attr('class', calculateEpisodeQuoteColor(showdata.episodeFileCount, showdata.episodeCount, showdata.monitored, showdata.status));
+    show.find("#seasons").append("Seasons " + showdata.statistics.seasonCount);
+    show.find("#episodes").html(showdata.statistics.episodeFileCount + "/" + showdata.statistics.episodeCount).attr('class', calculateEpisodeQuoteColor(showdata.statistics.episodeFileCount, showdata.statistics.episodeCount, showdata.monitored, showdata.status));
     show.find("#air-time").append(showdata.airTime);
     show.find("#summary").html(showdata.overview);
 
@@ -320,7 +321,7 @@ var getCalendar = {
         status : 'toBeAired',
         seriesTitle : episode.series.title,
         id : episode.id,
-        seriesId : episode.series.id,
+        seriesId: episode.seriesId,
       }
       //today
       if (new Date(episode.airDateUtc).valueOf() >= new Date().setHours(0, 0, 0, 0).valueOf() && new Date(episode.airDateUtc).valueOf() <= tomorrow.valueOf()) {
@@ -445,8 +446,8 @@ var getSeries = {
     template.find('.serie-general #title').html(serie.title);
     template.find('.serie-general #network').html(serie.network);
     template.find('.serie-general #status').html(serie.status).attr('class', status[serie.status]);
-    template.find(".serie-general #poster").attr('src', getImageUrl(serie.images[2]));
-    template.find(".serie-general #episodesCount").html(serie.episodeFileCount + "/" + serie.episodeCount).attr('class', calculateEpisodeQuoteColor(serie.episodeFileCount, serie.episodeCount, serie.monitored, serie.status));
+    template.find(".serie-general #poster").attr('src', getImageUrl(serie.images[1]));
+    template.find(".serie-general #episodesCount").html(serie.statistics.episodeFileCount + "/" + serie.statistics.episodeCount).attr('class', calculateEpisodeQuoteColor(serie.statistics.episodeFileCount, serie.statistics.episodeCount, serie.monitored, serie.status));
 
     // add identifier to toggle season panel
     template.find('.series').attr('serie-id', serie.id);
@@ -602,7 +603,7 @@ var getWantedEpisodes = {
         status : 'missing',
         seriesTitle : episode.series.title,
         id : episode.id,
-        seriesId : episode.series.id
+        seriesId : episode.seriesId
       }
 
       if(episode.hasFile){

@@ -32,7 +32,7 @@ function test_connection() {
 
   status.textContent = 'Connecting to ' + url;
   $.ajax({
-    url: url + 'api/system/status?apiKey=' + apiKey,
+    url: url + 'api/v3/system/status?apiKey=' + apiKey,
     statusCode: {
       401: function() {
         status.textContent = 'Credentials or url are not correct';
