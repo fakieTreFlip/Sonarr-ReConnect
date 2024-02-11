@@ -1,6 +1,7 @@
 The MIT License (MIT)
 
 Copyright (c) 2015 C. Vaes & T. Reinartz
+
 Copyright (c) 2024 fakieTreFlip
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
