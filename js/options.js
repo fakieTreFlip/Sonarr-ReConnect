@@ -86,6 +86,10 @@ function save_options() {
     sonarrConfig : sonarrConfig,
     showBadge : showBadge,
   }, function() {
+    chrome.alarms.clear("fetchData", function() {
+      chrome.alarms.create("fetchData", { periodInMinutes: Number(backgroundInterval) });
+      console.log(`Alarm "fetchData" updated to new interval: ${backgroundInterval} minutes.`);
+    });
     // Update status to let user know options were saved.
     var status = document.getElementById('status');
     status.textContent = 'Options saved.';

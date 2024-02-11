@@ -582,7 +582,12 @@ var getWantedEpisodes = {
       // return;
     }
     var totalRecords = data.totalRecords.toString();
-    background.setBadge(totalRecords)
+
+    if(app.settings.showBadge == "true" || totalRecords > 0) {
+      chrome.action.setBadgeText({text:totalRecords})
+    } else {
+      chrome.action.setBadgeText({text: ''});
+    }
 
     data = data.records;
 
